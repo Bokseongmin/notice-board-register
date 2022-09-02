@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper">
+
+    <insert id="board_write" parameterType="homeVo">
+        INSERT INTO board(bno, title, content, writer, date)
+        VALUES ((SELECT IFNULL(MAX(a.bno),0)+1 AS
+                            bno FROM
+                board as a),
+                #{title},
+                #{content},
+                #{writer},
+                date_format(now(), '%Y-%m-%d'));
+    </insert>
+
+    <select id="board_read" resultType="homeVo">
+        SELECT bno, title, content, writer, date, viewCnt
+        FROM board
+        WHERE bno=#{bno};
+    </select>
+
+    <update id="board_update" parameterType="homeVo">
+        UPDATE board
+        SET             title = #{title},
+                        content = #{content}
+        WHERE           bno = #{bno};
+    </update>
+
+    <delete id="board_delete" parameterType="homeVo">
+        DELETE FROM board
+        WHERE bno=#{bno};
+    </delete>
+
+    <delete id="board_reply" parameterType="homeVo">
+        DELETE FROM reply
+        WHERE bno=#{bno};
+    </delete>
+
+    <select id="board_list" resultType="homeVo">
+        SELECT bno, title, writer, date, viewCnt
+        FROM board
+        ORDER BY bno DESC;
+    </select>
+
+    <select id="board_list_page" resultType="hashMap" parameterType="homeVo">
+        SELECT          bno, title, content, writer, date, viewCnt
+        FROM            board
+        WHERE           bno > 0
+        ORDER BY        bno DESC, date DESC
+            LIMIT           #{displayPost}, #{postNum}
+    </select>
+
+    <select id="board_count" resultType="int">
+        SELECT COUNT(*)
+        FROM board;
+    </select>
+
+    <select id="board_search" parameterType="hashMap" resultType="homeVo">
+        SELECT bno,title,content, writer, date, viewCnt
+        FROM board
+        <if test='searchType.equals("title")'>
+            WHERE           title LIKE concat('%', #{keyword}, '%')
+        </if>
+
+        <if test='searchType.equals("content")'>
+            WHERE           content LIKE concat('%', #{keyword}, '%')
+        </if>
+
+        <if test='searchType.equals("title_content")'>
+            WHERE           title LIKE concat('%', #{keyword}, '%')
+            or              content LIKE concat('%', #{keyword}, '%')
+        </if>
+
+        <if test='searchType.equals("writer")'>
+            WHERE           writer LIKE concat('%', #{keyword}, '%')
+        </if>
+        ORDER BY        bno DESC
+        LIMIT           #{displayPost}, #{postNum}
+    </select>
+
+    <select id="search_count" parameterType="hashMap" resultType="int">
+        SELECT          count(bno)
+        FROM            board
+
+        <if test='searchType.equals("title")'>
+            WHERE           title LIKE concat('%', #{keyword}, '%')
+        </if>
+
+        <if test='searchType.equals("content")'>
+            WHERE content LIKE concat('%', #{keyword}, '%')
+        </if>
+
+        <if test='searchType.equals("title_content")'>
+            WHERE title LIKE concat('%', #{keyword}, '%')
+            or content LIKE concat('%', #{keyword}, '%')
+        </if>
+
+        <if test='searchType.equals("writer")'>
+            WHERE writer LIKE concat('%', #{keyword}, '%')
+        </if>
+
+    </select>
+</mapper>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="member_mapper">
+    <insert id="register">
+        INSERT INTO member(userID, userPass, userName, regDate, verify)
+        VALUES (#{userID}, #{userPass}, #{userName}, date_format(now(), '%Y-%m-%d'), 0);
+    </insert>
+
+    <select id="login" resultType="memberVo">
+        SELECT userID, userPass, userName, verify
+        FROM member
+        WHERE userID=#{userID} AND userPass=#{userPass};
+    </select>
+
+    <update id="modify">
+        UPDATE member
+        SET userPass=#{userPass}
+        WHERE userName=#{userName};
+    </update>
+    
+    <delete id="delete">
+        DELETE FROM member
+        WHERE userID=#{userID}
+        AND userPass=#{userPass}
+    </delete>
+
+    <select id="id_check" resultType="memberVo">
+        SELECT userID
+        FROM member
+        WHERE userID=#{userID};
+    </select>
+
+    <select id="loginBcrypt" resultType="memberVo">
+        SELECT userID, userPass, userName, verify
+        FROM member
+        WHERE userID=#{userID};
+    </select>
+</mapper>

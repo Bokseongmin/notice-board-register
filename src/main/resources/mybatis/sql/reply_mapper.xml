@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="reply_mapper">
+
+    <select id="reply_list" resultType="replyVo">
+        SELECT bno, rno, content, writer, date
+        FROM reply
+        WHERE bno=#{bno}
+    </select>
+
+    <select id="reply_select_read" resultType="replyVo">
+        SELECT bno, rno, content, writer, date
+        FROM reply
+        WHERE rno=#{rno}
+    </select>
+
+    <insert id="reply_write">
+        INSERT INTO reply(bno, writer, content, date)
+        VALUE (#{bno}, #{writer}, #{content}, date_format(now(), '%Y-%m-%d'));
+    </insert>
+
+    <update id="reply_update">
+        UPDATE reply
+        SET content = #{content}
+        WHERE rno = #{rno}
+    </update>
+
+    <update id="reply_delete">
+        DELETE FROM reply
+        WHERE rno = #{rno}
+    </update>
+</mapper>
